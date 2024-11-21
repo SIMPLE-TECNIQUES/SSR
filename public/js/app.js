@@ -1,6 +1,6 @@
 // console.log("wather data");
 function fetchData(address,msg1,msg2){
-fetch(`http://localhost:3000/weather?address=${address}`)
+fetch(`/weather?address=${address}`)
 .then((response)=>response.json())
 .then((data)=>{
     if(data.error){
