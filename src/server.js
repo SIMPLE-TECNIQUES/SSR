@@ -3,10 +3,12 @@ const express = require("express");
 const res = require("express/lib/response");
 const app=express();
 const hbs=require("hbs");
+const { query } = require("express");
+const weather=require("./weatherApi/weather");
+// const exphbs = require('express-handlebars'); 
 
 console.log(path.join(__dirname,"../public"));
 console.log(__filename);
-
 
 // Path to certain files 
 const pathToHtml=path.join(__dirname,"../public")
@@ -25,12 +27,21 @@ app.set('view engine','hbs')
 
 app.set("views",pathToviewEngine)
 hbs.registerPartials(pathToPartials);
+//Dynamic data in footer
+// app.engine('hbs', exphbs.engine({
+//     extname: '.hbs',
+//     helpers: {
+//       currentYear: () => new Date().getFullYear()
+//     }
+//   }));
+  hbs.registerHelper('currentYear', () => new Date().getFullYear());
 
 //routes
+
 app.get("",(req,res)=>{
     res.render("index",{
-        title:"home page ",
-        desc:"content in home page"
+        title:"Weather",
+        desc:"Weather information "
     })
 })
 
@@ -61,7 +72,43 @@ app.get("/profile",(req,res)=>{
         weather:"rainy"
     }]);
  })
+app.get("/weather",(req,res)=>{
+    if(!req.query.address){
+       return  res.send({
+            error:"provide the address value"
+        })
+  
+    }else{
+        weather(req.query.address,(error,{location,Temp,longitude,latitude})=>{
+            console.log(req.query.address);
+            if(error){
+                console.log(data);
+            res.send({
+            // location:`${data.location}`,
+            // Temp:`${data.current}`
+            ErrorMsg:error
+            
+            })}
+            return res.send({
+                // weatherData:data,
+                location,
+                Temp,
+                longitude,
+                latitude
+                // location:data.location,
+                // Temperture: data.Temp,
+                // Longitude:data.longitude,
+                // latitude:data.latitude
+            })
+        })
 
+    // res.send({
+    //     weather:"good weather",
+    //     address:req.query.address
+    // })
+    // console.log(query.address)
+}
+})
  app.get("/about/*",(req,res)=>{
      res.render("404page",{
         title:"404 page",
